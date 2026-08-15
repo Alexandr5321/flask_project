@@ -7,5 +7,15 @@ def test_health():
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json == {"status": "ok"}
-    assert response.json == {"service": "flask_project"}
+    assert response.json == {
+	"status": "ok",
+	"service": "flask_project"
+}
+
+def test_info():
+    client = app.test_client()
+    
+    response = client.get("/info")
+
+    assert response.status_code == 200
+    assert response.json == { "service": "flask_project" }
