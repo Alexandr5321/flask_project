@@ -1,8 +1,8 @@
 # Flask DevOps Project
 
-A simple Flask application used as a practical DevOps project.
+A simple Flask application created as a practical DevOps project.
 
-The project demonstrates containerization, automated deployment with Ansible, Docker Compose, and basic application testing with pytest.
+The project demonstrates the basic application deployment workflow using **Python, Flask, Docker, Docker Compose, Ansible, and pytest**.
 
 ## Tech Stack
 
@@ -35,27 +35,19 @@ flask_project/
 
 ## Application
 
-The application provides two endpoints.
+The Flask application provides two endpoints.
 
-### Home
+### `GET /`
 
-```http
-GET /
-```
-
-Response:
+Returns a simple response confirming that the application is running.
 
 ```text
 Hello from Docker! Simple Flask app is working.
 ```
 
-### Health Check
+### `GET /health`
 
-```http
-GET /health
-```
-
-Response:
+Health check endpoint.
 
 ```json
 {
@@ -63,14 +55,21 @@ Response:
 }
 ```
 
-The `/health` endpoint can be used by monitoring systems or container orchestration platforms to check whether the application is responding.
+The endpoint can be used by monitoring or orchestration systems to verify that the application is responding.
+
+---
 
 ## Run Locally
 
-Create and activate a virtual environment:
+Create a virtual environment:
 
 ```bash
 python3 -m venv venv
+```
+
+Activate it:
+
+```bash
 source venv/bin/activate
 ```
 
@@ -80,13 +79,13 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run the application:
+Start the application:
 
 ```bash
 python app/app.py
 ```
 
-The application will be available at:
+The application will listen on:
 
 ```text
 http://localhost:5000
@@ -99,6 +98,8 @@ curl http://localhost:5000
 curl http://localhost:5000/health
 ```
 
+---
+
 ## Run with Docker Compose
 
 Build and start the application:
@@ -107,13 +108,19 @@ Build and start the application:
 docker compose up --build
 ```
 
-The application will be available at:
+Docker Compose maps the container port `5000` to host port `5001`:
+
+```text
+Host:5001 → Container:5000
+```
+
+The application is available at:
 
 ```text
 http://localhost:5001
 ```
 
-Check the application:
+Test the endpoints:
 
 ```bash
 curl http://localhost:5001
@@ -126,9 +133,11 @@ Stop the application:
 docker compose down
 ```
 
+---
+
 ## Testing
 
-The project uses pytest for basic application testing.
+The project uses **pytest** for application testing.
 
 Run tests from the project root:
 
@@ -136,33 +145,37 @@ Run tests from the project root:
 pytest
 ```
 
-Example result:
+The current test verifies the `/health` endpoint:
+
+* HTTP status code is `200`
+* response contains the expected JSON
+
+Example:
 
 ```text
+============================= test session starts =============================
 collected 1 item
 
-tests/test_app.py .    [100%]
+tests/test_app.py .                                                     [100%]
 
-1 passed
+============================== 1 passed ======================================
 ```
 
-The current test verifies that the `/health` endpoint:
-
-* returns HTTP 200
-* returns the expected JSON response
+---
 
 ## Ansible Deployment
 
-The project includes an Ansible playbook for deploying the application to a Linux server.
+The project contains an Ansible playbook for deploying the application to a Linux host.
 
-The playbook:
+The playbook performs the following tasks:
 
 1. Updates the APT package cache
 2. Installs Docker and Docker Compose
 3. Starts and enables the Docker service
 4. Creates the application directory
-5. Deploys the application files
-6. Builds and starts the Docker Compose application
+5. Creates the application files
+6. Builds the Docker image
+7. Starts the application with Docker Compose
 
 Run the deployment:
 
@@ -171,7 +184,15 @@ cd ansible-flask-deploy
 ansible-playbook -i inventory.ini playbook.yml
 ```
 
-## Deployment Architecture
+The deployed application is available on the configured host port:
+
+```text
+http://localhost:5001
+```
+
+---
+
+## Deployment Flow
 
 ```text
 Developer
@@ -180,55 +201,57 @@ Developer
    Git
     │
     ▼
-Ansible
+ Ansible
     │
     ├── Install Docker
-    ├── Deploy application
+    ├── Configure application
     └── Start Docker Compose
-                │
-                ▼
-        ┌───────────────┐
-        │    Docker     │
-        │               │
-        │    Flask      │
-        │   Container   │
-        └───────┬───────┘
-                │
-             :5000
-                │
-                ▼
+              │
+              ▼
+       ┌───────────────┐
+       │    Docker     │
+       │               │
+       │    Flask      │
+       │   Container   │
+       └───────┬───────┘
+               │
+            :5000
+               │
+               ▼
           Host :5001
 ```
 
-## Goals
+## DevOps Concepts Demonstrated
 
-This project is primarily focused on practicing DevOps fundamentals:
+This project is focused on practicing the following DevOps fundamentals:
 
 * Linux administration
 * Docker containerization
 * Docker Compose
 * Infrastructure automation with Ansible
 * Application health checks
-* Automated testing
-* Basic deployment workflow
+* Automated application testing
+* Basic deployment automation
+* Git-based development workflow
 
-## Future Improvements
+## Current Scope
 
-Possible future improvements include:
+The project intentionally remains small so that each component can be understood and maintained easily.
+
+Planned improvements may include:
 
 * CI/CD pipeline
 * Docker image registry
-* PostgreSQL database
+* PostgreSQL
 * Nginx reverse proxy
-* Prometheus and Grafana monitoring
-* Improved test coverage
-* Production-ready Gunicorn configuration
+* Gunicorn
+* Prometheus and Grafana
+* Additional automated tests
 * Secrets management
-
----
 
 ## Author
 
 **Alexandr Prohnitskii**
 
 DevOps Engineer
+
