@@ -16,3 +16,10 @@ def test_info():
 
     assert response.json == { "app": "flask_project",
                               "version": "1.0" }
+
+def test_version():
+    client = app.test_version()
+
+    response = client.get("/version")
+
+    assert response.json == { "version": "1.0" }
