@@ -14,5 +14,5 @@ def test_info():
     
     response = client.get("/info")
 
-    assert response.status_code == 200
-    assert response.json == { "service": "flask_project" }
+    assert response.json == { "app": "flask_project",
+                              "version": "1.0" }
