@@ -18,7 +18,7 @@ def test_info():
                               "version": "1.0" }
 
 def test_version():
-    client = app.test_version()
+    client = app.test_client()
 
     response = client.get("/version")
 
