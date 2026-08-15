@@ -10,5 +10,12 @@ def hello():
 def health():
     return {"status": "ok"}
 
+@app.route("/info", methods=['GET'])
+def info():
+    return {
+            "app": "flask_project",
+            "version": "1.0"
+            }
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
