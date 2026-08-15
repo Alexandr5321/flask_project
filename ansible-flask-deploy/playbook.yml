@@ -1,0 +1,59 @@
+---
+- name: Deploy Flask app with Docker
+  hosts: servers
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create project directory
+      file:
+        path: /opt/flask-app
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose file
+      copy:
+        content: |
+          services:
+            web:
+              image: python:3.12-slim
+              working_dir: /app
+              command: >
+                sh -c "pip install flask &&
+                       python -c '
+          from flask import Flask
+          app = Flask(__name__)
+          @app.route(\"/\")
+          def hello():
+              return \"Hello from Ansible + Docker!\"
+          @app.route(\"/health\")
+          def health():
+              return {\"status\": \"ok\"}
+          app.run(host=\"0.0.0.0\", port=5000)
+          '"
+              ports:
+                - "5001:5000"
+        dest: /opt/flask-app/docker-compose.yml
+
+    - name: Run the application
+      command: docker-compose up -d
+      args:
+        chdir: /opt/flask-app
