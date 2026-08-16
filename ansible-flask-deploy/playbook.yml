@@ -1,8 +1,9 @@
 ---
 - name: Deploy Flask app with Docker
-  hosts: servers
+  hosts: web
   become: true
-
+  vars:
+    image_tag: "a68a1cc7080a7e92c3ea53067d0cd83226db1dc7"
   tasks:
 
     - name: Update apt cache
@@ -30,53 +31,6 @@
         state: directory
         mode: "0755"
 
-    - name: Create Flask application
-      ansible.builtin.copy:
-        dest: /opt/flask-app/app.py
-        mode: "0644"
-        content: |
-          from flask import Flask
-
-          app = Flask(__name__)
-
-
-          @app.route("/")
-          def hello():
-              return "Hello from Ansible + Docker!"
-
-
-          @app.route("/health")
-          def health():
-              return {"status": "ok"}
-
-
-          if __name__ == "__main__":
-              app.run(host="0.0.0.0", port=5000)
-
-    - name: Create requirements.txt
-      ansible.builtin.copy:
-        dest: /opt/flask-app/requirements.txt
-        mode: "0644"
-        content: |
-          Flask==3.1.3
-
-    - name: Create Dockerfile
-      ansible.builtin.copy:
-        dest: /opt/flask-app/Dockerfile
-        mode: "0644"
-        content: |
-          FROM python:3.12-slim
-
-          WORKDIR /app
-
-          COPY requirements.txt .
-
-          RUN pip install --no-cache-dir -r requirements.txt
-
-          COPY app.py .
-
-          CMD ["python", "app.py"]
-
     - name: Create docker-compose.yml
       ansible.builtin.copy:
         dest: /opt/flask-app/docker-compose.yml
@@ -84,11 +38,16 @@
         content: |
           services:
             web:
-              build: .
-              ports:
-                - "5001:5000"
+            image: ghcr.io/alexandr5321/flask_project:{{ image_tag }}
+            ports:
+              - "5001:5000"
+            restart: unless-stopped 
+
+    - name: Docker pull
+      ansible.builtin.command:
+        cmd: docker pull ghcr.io/alexandr5321/flask_project:{{ image_tag }}
 
     - name: Start Flask application
       ansible.builtin.command:
-        cmd: docker compose up -d --build
+        cmd: docker compose up -d 
         chdir: /opt/flask-app
