@@ -46,4 +46,4 @@ jobs:
 	  password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Docker image
-        run: docker push ghcr.io/alexandr5321/flask_project:$ {{ github.sha }}
+        run: docker push ghcr.io/alexandr5321/flask_project:${{ github.sha }}
