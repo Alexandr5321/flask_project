@@ -2,35 +2,26 @@
 - name: Deploy Flask app with Docker
   hosts: web
   become: true
+
   vars:
-    image_name: "ghcr.io/alexandr5321/flask_project"    
+    image_name: "ghcr.io/alexandr5321/flask_project"
+
   tasks:
 
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
       when: ansible_facts["os_family"] == "Debian"
-   
+
     - name: Check Docker
       ansible.builtin.command:
         cmd: docker --version
-        changed_when: false
+      changed_when: false
 
     - name: Check Docker Compose
       ansible.builtin.command:
         cmd: docker compose version
-        changed_when: false
-
-    - name: Install Docker
-      ansible.builtin.apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-        state: present
-      when: ansible_facts["os_family"] == "Debian"
+      changed_when: false
 
     - name: Start and enable Docker
       ansible.builtin.service:
@@ -51,16 +42,16 @@
         content: |
           services:
             web:
-            image: ghcr.io/alexandr5321/flask_project:{{ image_tag }}
-            ports:
-              - "5001:5000"
-            restart: unless-stopped 
+              image: {{ image_name }}:{{ image_tag }}
+              ports:
+                - "5001:5000"
+              restart: unless-stopped
 
-    - name: Docker pull
+    - name: Pull Docker image
       ansible.builtin.command:
         cmd: docker pull {{ image_name }}:{{ image_tag }}
 
     - name: Start Flask application
       ansible.builtin.command:
-        cmd: docker compose up -d 
+        cmd: docker compose up -d
         chdir: /opt/flask-app
