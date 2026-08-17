@@ -47,3 +47,18 @@ jobs:
 
       - name: Push Docker image
         run: docker push ghcr.io/alexandr5321/flask_project:${{ github.sha }}
+
+  deploy:
+    needs: test
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Ansible deploy
+        run: |
+          ansible-playbook \
+            -i ansible-flask-deploy/inventory.ini \
+            ansible-flask-deploy/playbook.yml \
+            -e "image_tag=${{ github.sha }}"
