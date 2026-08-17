@@ -10,6 +10,7 @@
       ansible.builtin.apt:
         update_cache: true
       when: ansible_facts["os_family"] == "Debian"
+   
     - name: Check Docker
       ansible.builtin.command:
         cmd: docker --version
@@ -18,7 +19,7 @@
     - name: Check Docker Compose
       ansible.builtin.command:
         cmd: docker compose version
-      changed_when: false
+        changed_when: false
 
     - name: Install Docker
       ansible.builtin.apt:
