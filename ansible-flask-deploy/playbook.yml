@@ -3,7 +3,7 @@
   hosts: web
   become: true
   vars:
-    image_tag: "a68a1cc7080a7e92c3ea53067d0cd83226db1dc7"
+    image_name: "ghcr.io/alexandr5321/flask_project"    
   tasks:
 
     - name: Update apt cache
@@ -45,7 +45,7 @@
 
     - name: Docker pull
       ansible.builtin.command:
-        cmd: docker pull ghcr.io/alexandr5321/flask_project:{{ image_tag }}
+        cmd: docker pull {{ image_name }}:{{ image_tag }}
 
     - name: Start Flask application
       ansible.builtin.command:
